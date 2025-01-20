@@ -18,13 +18,11 @@ def count_neighbors(grid, x, y):
         (0, -1),         (0, 1),
         (1, -1), (1, 0), (1, 1)
     ]
-    count = 0
     rows, cols = len(grid), len(grid[0])
-    for dx, dy in directions:
-        nx, ny = x + dx, y + dy
-        if 0 <= nx < rows and 0 <= ny < cols and grid[nx][ny] == "#":
-            count += 1
-    return count
+    return sum(
+        0 <= x + dx < rows and 0 <= y + dy < cols and grid[x + dx][y + dy] == "#"
+        for dx, dy in directions
+    )
 
 def next_generation(grid):
     """Generate the next state of the grid based on the rules."""
@@ -34,34 +32,45 @@ def next_generation(grid):
     for x in range(rows):
         for y in range(cols):
             live_neighbors = count_neighbors(grid, x, y)
-            if grid[x][y] == "#":
-                # Cell is alive
-                if live_neighbors in [2, 3]:
-                    new_grid[x][y] = "#"
-                else:
-                    new_grid[x][y] = " "
-            else:
-                # Cell is dead
-                if live_neighbors == 3:
-                    new_grid[x][y] = "#"
+            if grid[x][y] == "#" and live_neighbors in [2, 3]:
+                new_grid[x][y] = "#"
+            elif grid[x][y] == " " and live_neighbors == 3:
+                new_grid[x][y] = "#"
 
     return new_grid
 
-def main():
-    rows, cols = 20, 40  # Dimensions of the grid
+def add_pattern(grid, pattern, x_offset=0, y_offset=0):
+    """Add a predefined pattern to the grid at the given offset."""
+    for x, row in enumerate(pattern):
+        for y, cell in enumerate(row):
+            if 0 <= x + x_offset < len(grid) and 0 <= y + y_offset < len(grid[0]):
+                grid[x + x_offset][y + y_offset] = cell
+
+def main(rows=20, cols=40, speed=0.5):
+    """Main function to run the Game of Life."""
     grid = create_grid(rows, cols)
 
     # Define an initial pattern (glider example)
-    grid[1][2] = "#"
-    grid[2][3] = "#"
-    grid[3][1] = "#"
-    grid[3][2] = "#"
-    grid[3][3] = "#"
+    glider = [
+        [" ", "#", " "],
+        [" ", " ", "#"],
+        ["#", "#", "#"]
+    ]
+    add_pattern(grid, glider, x_offset=1, y_offset=2)
 
     while True:
         print_grid(grid)
         grid = next_generation(grid)
-        time.sleep(0.5)  # Pause between generations
+        time.sleep(speed)
 
 if __name__ == "__main__":
-    main()
+    # Dynamic grid size and speed setup
+    try:
+        rows = int(input("Enter grid rows (default 20): ") or 20)
+        cols = int(input("Enter grid columns (default 40): ") or 40)
+        speed = float(input("Enter speed in seconds (default 0.5): ") or 0.5)
+    except ValueError:
+        print("Invalid input! Using default values.")
+        rows, cols, speed = 20, 40, 0.5
+
+    main(rows, cols, speed)
