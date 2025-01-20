@@ -65,12 +65,18 @@ def main(rows=20, cols=40, speed=0.5):
 
 if __name__ == "__main__":
     # Dynamic grid size and speed setup
+    rows, cols, speed = 20, 40, 0.5
     try:
-        rows = int(input("Enter grid rows (default 20): ") or 20)
-        cols = int(input("Enter grid columns (default 40): ") or 40)
-        speed = float(input("Enter speed in seconds (default 0.5): ") or 0.5)
+        rows_input = input("Enter grid rows (default 20): ")
+        if rows_input.strip():
+            rows = int(rows_input)
+        cols_input = input("Enter grid columns (default 40): ")
+        if cols_input.strip():
+            cols = int(cols_input)
+        speed_input = input("Enter speed in seconds (default 0.5): ")
+        if speed_input.strip():
+            speed = float(speed_input)
     except ValueError:
-        print("Invalid input! Using default values.")
-        rows, cols, speed = 20, 40, 0.5
+        print("Invalid input detected! Using default values (rows=20, cols=40, speed=0.5).")
 
     main(rows, cols, speed)
